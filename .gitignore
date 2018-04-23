@@ -1,0 +1,4 @@
+./jupyter-notebooks/spark-warehouse/*
+__pycache__/
+*.py[cod]
+metastore_db/
