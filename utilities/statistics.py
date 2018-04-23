@@ -10,25 +10,25 @@ def get_total_pkts_flowid(df):
 	# Group by Connections ID = IP Client, Server / Port Client, Server and Sum of pkts in Server and Client
 	connect_pkts =  df.groupby(['#c_ip:1','c_port:2','s_ip:15','s_port:16','tag:132']).agg({'c_pkts_all:3':'sum','s_pkts_all:17':'sum'})
 
-	# Get nºpackets per flow
+	# Get npackets per flow
 	connect_pkts = connect_pkts.withColumn('total_pkts',connect_pkts['sum(c_pkts_all:3)'].__add__(connect_pkts['sum(s_pkts_all:17)']))
 
 	return connect_pkts
 
 
-def compute_ranking(df, feature, ranges=None, bins=None):
+def compute_ranking(df, ranges=None, bins=None):
 
 	connect_pkts = get_total_pkts_flowid(df)
 
 	if bins:
-	   wSpec3 = Window.orderBy(connect_ranks)
+	   wSpec3 = Window.orderBy('total_pkts')
 	   connect_ranks = connect_pkts.withColumn("rank", ntile(bins).over(wSpec3))
 	   rank_count = connect_ranks.groupby('rank').agg({'rank':'count'})
 
 	if ranges:
 		rank = 1
 		for range in ranges: 
-		 	connect_ranks = connect_ranks.withColumn('rank',when( (connect_ranks[feature] >= range[0]) & (connect_ranks[feature] <= range[1]) , rank).otherwise(-1))
+		 	connect_ranks = connect_ranks.withColumn('rank',when( (connect_ranks['total_pkts'] >= range[0]) & (connect_ranks['total_pkts'] <= range[1]) , rank).otherwise(-1))
 		 	rank += 1
 
 	# add the rank to the subflows/rows of the original dataset

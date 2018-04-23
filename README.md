@@ -30,9 +30,9 @@ $ tar -xzf spark-2.3.0-bin-hadoop2.7
 
 $ mv spark-2.3.0-bin-hadoop2.7 /opt/spark-2.3.0
 
-$ ln -s /opt/spark-2.3.0 /opt/spark̀
+$ ln -s /opt/spark-2.3.0 /opt/spark̀2
 
-$ export SPARK_HOME=/opt/spark
+$ export SPARK_HOME=/opt/spark2
 
 $ export PATH=$SPARK_HOME/bin:$PATH
 ```
