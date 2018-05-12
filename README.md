@@ -1,5 +1,5 @@
 # SmartTrafficAnalyzer
-Smart Network Traffic Analyzer
+Smart Network Traffic Analyzer (STA)
 
 
 project tree
@@ -8,18 +8,23 @@ project tree
 This repository is organised in the following way:
 
 <pre>
-   SmartTraficcAnalyzer
-   ├── post-processing/     : some functionalities to perform some post-processing operations 
+   SmartTrafficAnalyzer
+   ├── utilities/           : some functionalities to compute some statistics and perform some post-processing operations 
    ├── checker/             : rule-based checker to ensure data quality 
-   ├── statistics/          : compute some statistics over the datasets
-   ├── jupyter-notebooks/   : scripts with different experiments used to train ml algorithms
+   ├── jupyter-notebooks/   : scripts used to train ml algorithms
+   ├── deployment/          : scripts and procedures used to deploy the trained ml algorithm on a real scenario
    └── README               : this file
 
 </pre>
 
 ## Requirements
 
-This project uses pyspark to perform massive distributed processing over resilient sets of data
+
+This project uses:
+
+*  pyspark to perform massive distributed processing over resilient sets of data
+*  tensorflow and scickit-learn for machine learning
+*  jupyter notebook 
 
 ###### (1) Install pySpark
 
