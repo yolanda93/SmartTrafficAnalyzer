@@ -4,16 +4,19 @@ from pyspark.sql import SQLContext
 from pyspark.sql import functions
 from pyspark.sql.functions import rank, min, dense_rank, percent_rank, ntile, col, row_number
 from pyspark.sql.window import Window
-from utilities import statistics, post_processing
+from utilities import statistics
 import csv
 
 def subsampling(spark_ctx, sql_context, df, ranges=None, bins=None, sample_ratios=None, take_first=None):
 	"""
 	tcp_complete datasets
 	range is an array of tuples
+	take_first is an array of tuples of the n first flows to be taken in each interval
+	sample_ratio applies a subsampling ratio to each interval
 	"""
+	df = statistics.get_total_pkts_flowid(df)
 
-	df_ranked, rank_counts = statistics.compute_ranking(df, ranges, bins)
+	df_ranked = statistics.compute_ranking(df, ranges, bins,'total_pkts')
 
 	subsampled = sql_context.createDataFrame(spark_ctx.emptyRDD(), df_ranked.schema)
 
@@ -34,13 +37,8 @@ def subsampling(spark_ctx, sql_context, df, ranges=None, bins=None, sample_ratio
 				subsampled = subsampled.union(df_ranked_filtered)
 
 			else:
-				window = Window.partitionBy("Flow_ID").orderBy(col("first:29").desc())
+				window = Window.partitionBy("flow_id").orderBy(col("first:29").desc())
 
 				subsampled = subsampled.union(df_ranked_filtered.withColumn("r", functions.row_number().over(window)).where(col("r") <= ntake).drop('r'))
-			#else:
-			#	nflows = df_ranked_filtered.select("Flow_ID").distinct().rdd.map(lambda r: r[0]).collect()
-			#	for flow_id in nflows:
-			#		df_ranked_flow_filtered = df_ranked_filtered.filter(df_ranked_filtered['Flow_ID']==flow_id)
-			#		subsampled = subsampled.union(df_ranked_flow_filtered.sample(False, float(ratio), seed=0))
 
 	return subsampled
